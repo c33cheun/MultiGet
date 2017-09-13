@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const url = require('url');
 var http = require('http');
 var fs = require('fs');
 var program = require('commander');
@@ -13,8 +14,8 @@ program
   .arguments('<url>')
   .option('-p, --parallel', 'Download chunks in parallel instead of sequentially')
   .option('-o, --overwrite <destination>', 'Write to custom destination file instead of default')
-  .action(function (url) {
-    downloadURL = url;
+  .action(function (urlOption) {
+    downloadURL = urlOption;
   })
   .parse(process.argv);
 
@@ -38,70 +39,75 @@ if (program.overwrite) {
   destination = program.overwrite;
 }
 
-console.log(downloadURL);
-console.log(destination);
+console.log("Downloading from: " + downloadURL);
+console.log("Downloading file to: " + destination);
 
+checkFile(destination);
 
+if (isParallel) {
 
-var download = function(url, dest, cb) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.open("GET","data.dat",false);
-  xmlhttp.setRequestHeader("Range", "bytes=100-200");
-  xmlhttp.send();
+} else {
+  console.log("Starting download...");
+  download1();
+}
 
-  var file = fs.createWriteStream(dest);
+// FUNCTIONS
 
+// check to see if destination file exists already and delete if present, repurposed from (https://stackoverflow.com/questions/5315138/node-js-remove-file)
+function checkFile(destination) {
+  fs.exists(destination, function(exists) {
+    if(exists) {
+      console.log('File exists. Deleting now ...');
+      fs.unlink(destination);
+    } else {
+      //Show in red
+      console.log('File not found, so not deleting.');
+    }
+  });
+}
+
+function download1() {
+  download(downloadURL, destination, "bytes=0-1048575", download2);
+}
+
+function download2() {
+  download(downloadURL, destination, "bytes=1048576-2097151", download3);
+}
+
+function download3() {
+  download(downloadURL, destination, "bytes=2097152-3145727", download4);
+}
+
+function download4() {
+  download(downloadURL, destination, "bytes=3145728-4194303");
+}
+
+function download(urlString, dest, range, cb) {
+  var urlObject = url.parse(urlString);
   var options = {
-      host: 'localhost',
-      port: 7474,
-      path: '/db/data',
+      hostname: urlObject.hostname,
+      port: urlObject.port,
+      path: urlObject.pathname,
       method: 'GET',
       headers: {
-          accept: 'application/json'
+          accept: 'application/json',
+          range: range
       }
   };
 
-  http.get(url, (res) => {
-    const { statusCode } = res;
-    const contentType = res.headers['content-type'];
-
-    let error;
-    if (statusCode !== 200) {
-      error = new Error('Request Failed.\n' +
-                        `Status Code: ${statusCode}`);
-    } else if (!/^application\/json/.test(contentType)) {
-      error = new Error('Invalid content-type.\n' +
-                        `Expected application/json but received ${contentType}`);
-    }
-    if (error) {
-      console.error(error.message);
-      // consume response data to free up memory
-      res.resume();
-      return;
-    }
-
-    res.setEncoding('utf8');
-    let rawData = '';
-    res.on('data', (chunk) => { rawData += chunk; });
-    res.on('end', () => {
-      try {
-        const parsedData = JSON.parse(rawData);
-        console.log(parsedData);
-      } catch (e) {
-        console.error(e.message);
-      }
+  var request = http.get(options, function(response) {
+    response.on("data", function(chunk) {
+      fs.appendFile(dest, chunk, function (err) {
+        if (err) throw err;
+      });
     });
-  }).on('error', (e) => {
-    console.error(`Got error: ${e.message}`);
-  });
-
-  var request = http.get(url, function(response) {
-    response.pipe(file);
-    file.on('finish', function() {
-      file.close(cb);  // close() is async, call cb after close completes.
-    });
+    console.log('Wrote to file: ' + range);
+    // run callback after
+    if (cb) {
+      cb();
+    }
   }).on('error', function(err) { // Handle errors
     fs.unlink(dest); // Delete the file async. (But we don't check the result)
-    if (cb) cb(err.message);
+    console.error(`Got error: ${err.message}`);
   });
 };
