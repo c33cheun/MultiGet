@@ -1,0 +1,25 @@
+{
+  "name": "multi-get",
+  "version": "1.0.0",
+  "description": "A command line program for partially downloading the first 4 MBs of a file",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "bin": {
+    "multi-get": "./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/c33cheun/MultiGet.git"
+  },
+  "author": "Christopher Cheung",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/c33cheun/MultiGet/issues"
+  },
+  "homepage": "https://github.com/c33cheun/MultiGet#readme",
+  "dependencies": {
+    "commander": "^2.11.0"
+  }
+}
