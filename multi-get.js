@@ -2,10 +2,13 @@
 const url = require('url');
 const http = require('http');
 const fs = require('fs');
+
+// commander is used for handling command line arguments
 const program = require('commander');
 
 // synchronize is a npm library for making async requests sequential
 const sync = require('synchronize');
+// set aliases for synchronize functions
 var fiber = sync.fiber;
 var await = sync.await;
 var defer = sync.defer;
@@ -139,7 +142,7 @@ function downloadSync(range, cb) {
     });
 
   }).on('error', function(err) { // Handle errors
-    fs.unlink(destination); // Delete the file async. (But we don't check the result)
+    fs.unlink(destination); // Delete the file async
     console.log(`Got error: ${err.message}`);
   });
 }
@@ -198,7 +201,7 @@ function downloadAsync(range, callback) {
     });
 
   }).on('error', function(err) { // Handle errors
-    fs.unlink(destination); // Delete the file async. (But we don't check the result)
+    fs.unlink(destination); // Delete the file async
     console.log(`Got error: ${err.message}`);
     cb(err);
   });
