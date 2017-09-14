@@ -2,12 +2,12 @@
   "name": "multi-get",
   "version": "1.0.0",
   "description": "A command line program for partially downloading the first 4 MBs of a file",
-  "main": "index.js",
+  "main": "multi-get.js",
   "scripts": {
-    "test": "node index.js"
+    "test": "node multi-get.js"
   },
   "bin": {
-    "multi-get": "./index.js"
+    "multi-get": "./multi-get.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/c33cheun/MultiGet#readme",
   "dependencies": {
+    "async": "^2.5.0",
     "commander": "^2.11.0",
     "synchronize": "^2.0.0"
   }

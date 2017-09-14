@@ -10,6 +10,8 @@ var fiber = sync.fiber;
 var await = sync.await;
 var defer = sync.defer;
 
+// async is a npm libary we're using to download with parallel requests
+const async = require("async");
 
 var downloadURL;
 var isParallel = false;
@@ -67,9 +69,10 @@ function main() {
   downloadURL = url.parse(downloadURL);
 
   if (isParallel) {
-
+    console.log("Starting download in parallel...");
+    downloadParallel();
   } else {
-    console.log("Starting download...");
+    console.log("Starting download sequence...");
     downloadParts();
   }
 
@@ -84,7 +87,6 @@ function checkFile(destination) {
       console.log('File exists. Deleting now ...');
       fs.unlink(destination);
     } else {
-      //Show in red
       console.log('Creating new file...');
     }
   });
@@ -92,6 +94,7 @@ function checkFile(destination) {
 
 function downloadParts() {
   // use synchronize library to defer async functions until they finish
+  // defer() is used as the callback to defer the next await() call until the async call is done
   try {
     fiber(function () {
       await(downloadSync(1, defer() ));
@@ -122,7 +125,7 @@ function downloadSync(range, cb) {
   };
 
   var request = http.get(options, function(response) {
-    // to hold chunks of data
+    // write to file while we receive data
     response.on("data", function(chunk) {
       fs.appendFileSync(destination, chunk)
     });
@@ -138,5 +141,65 @@ function downloadSync(range, cb) {
   }).on('error', function(err) { // Handle errors
     fs.unlink(destination); // Delete the file async. (But we don't check the result)
     console.log(`Got error: ${err.message}`);
+  });
+}
+
+function downloadParallel() {
+  var fileOrder = [1, 2, 3, 4];
+
+  // async map will run the downloadAsync on each of the members of fileOrder above in parallel
+  // it will then output an array of the 1MiB chunks of data, which are then appended to the write file
+  async.map(fileOrder, downloadAsync, function(err, results) {
+    if (!err) {
+      for (let i = 0; i < results.length; i++) {
+        if (results[i]) {
+          fs.appendFileSync(destination, results[i]);
+        }
+      }
+      finishDownload();
+    }
+  });
+}
+
+// This version of the download function is designed specifically for use with async.map, hence the specific form of the callback
+// It also passes on the chunk of data that it downloaded
+function downloadAsync(range, callback) {
+  var options = {
+      hostname: downloadURL.hostname,
+      port: downloadURL.port,
+      path: downloadURL.pathname,
+      method: 'GET',
+      headers: {
+          accept: 'application/json',
+          range: byteRanges[range]
+      }
+  };
+
+  http.get(options, function(response) {
+    // to hold chunks of data
+    var body = [];
+    var total_length = 0;
+    response.on("data", function(chunk) {
+      // while we retrieve byte data from body, keep track of length for later
+      body.push(chunk);
+      total_length += Buffer.byteLength(chunk);
+    });
+
+    response.on("end", function() {
+      console.log('Retrived file data for range: ' + byteRanges[range]);
+      // return the 1 MiB for merging later
+      if (callback) {
+        // user Buffer.concat and previously calculated to build buffer of correct size
+        body = Buffer.concat(body, total_length);
+
+        //the first argument is null because there is no error
+        callback(null, body);
+      }
+    });
+
+  }).on('error', function(err) { // Handle errors
+    fs.unlink(destination); // Delete the file async. (But we don't check the result)
+    console.log(`Got error: ${err.message}`);
+    cb(err);
   });
 }
