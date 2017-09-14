@@ -129,7 +129,7 @@ function downloadSync(range, cb) {
       }
   };
 
-  var request = http.get(options, function(response) {
+  http.get(options, function(response) {
     // write to file while we receive data
     response.on("data", function(chunk) {
       fs.appendFileSync(destination, chunk)
