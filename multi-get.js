@@ -16,6 +16,7 @@ var defer = sync.defer;
 // async is a npm libary we're using to download with parallel requests
 const async = require("async");
 
+// globals
 var downloadURL;
 var isParallel = false;
 const defaultFile = "384MB.jar";
@@ -31,6 +32,7 @@ const byteRanges = {
 
 main();
 
+// MAIN PROGRAM FUNCTION
 function main() {
   // process command line arguments from process.argv, using commander module from node
   program
@@ -81,7 +83,7 @@ function main() {
 
 }
 
-// FUNCTIONS
+// HELPER FUNCTIONS
 
 // check to see if destination file exists already and delete if present, repurposed from (https://stackoverflow.com/questions/5315138/node-js-remove-file)
 function checkFile(destination) {

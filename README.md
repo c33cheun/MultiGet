@@ -13,6 +13,24 @@ On Windows there may be some problems with running the above command, due to Win
 `node multi-get.js [OPTIONS] <url>`
 from a directory with the multi-get.js file.
 
+### Usage
+
+```
+$ multi-get
+
+  Usage: multi-get [options] <url>
+
+
+  Options:
+
+    -p, --parallel                 Download chunks in parallel instead of sequentially
+    -o, --overwrite <destination>  Write to custom destination file instead of default
+    -h, --help                     output usage information
+```
+
+<url> is the source url to download from, it is required for execution. Also running `multi-get` with no arguments will
+also output help.
+
 ### Open-Source Libraries
 
 async: (https://github.com/caolan/async)
@@ -25,4 +43,4 @@ Used to handle command line arguments.
 
 synchronize: http://alexeypetrushin.github.io/synchronize/docs/index.html
 
-Used await() and defer() from this library to execute asynchronous requests synchronously, and make code easier to read. 
+Used await() and defer() from this library to execute asynchronous requests synchronously, and make code easier to read.
