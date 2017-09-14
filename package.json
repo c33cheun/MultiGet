@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/c33cheun/MultiGet#readme",
   "dependencies": {
-    "commander": "^2.11.0"
+    "commander": "^2.11.0",
+    "synchronize": "^2.0.0"
   }
 }
