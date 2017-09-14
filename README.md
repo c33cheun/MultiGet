@@ -28,7 +28,7 @@ $ multi-get
     -h, --help                     output usage information
 ```
 
-<url> is the source url to download from, it is required for execution. Also running `multi-get` with no arguments will
+`<url>` is the source url to download from, it is required for execution. Also running `multi-get` with no arguments will
 also output help.
 
 ### Open-Source Libraries
