@@ -1,4 +1,4 @@
-# Multi-Get
+# Multiple Download Command Line
 JavaScript command line application for downloading file in multiple requests
 
 ### Getting Started
