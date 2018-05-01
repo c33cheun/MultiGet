@@ -7,18 +7,18 @@ To setup all node dependencies and build run (requires node package manager):
 `npm install -g`
 
 Now you can run the script by running:
-`multi-get [OPTIONS] <url>`
+`multi-download [OPTIONS] <url>`
 
 On Windows there may be some problems with running the above command, due to Windows paths, run the following
-`node multi-get.js [OPTIONS] <url>`
-from a directory with the multi-get.js file.
+`node multi-download.js [OPTIONS] <url>`
+from a directory with the multi-download.js file.
 
 ### Usage
 
 ```
-$ multi-get
+$ multi-download
 
-  Usage: multi-get [options] <url>
+  Usage: multi-download [options] <url>
 
 
   Options:
@@ -28,7 +28,7 @@ $ multi-get
     -h, --help                     output usage information
 ```
 
-`<url>` is the source url to download from, it is required for execution. Also running `multi-get` with no arguments will
+`<url>` is the source url to download from, it is required for execution. Also running `multi-download` with no arguments will
 also output help.
 
 ### Open-Source Libraries
